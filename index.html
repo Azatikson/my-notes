@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Notes</title>
+  <meta name="description" content="Быстрые заметки без аккаунта. Данные хранятся в браузере.">
+  <meta name="theme-color" content="#0e0e10">
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<div class="app" id="app" data-sidebar="visible" data-outline="visible">
+
+  <aside class="sidebar" aria-label="Список заметок">
+    <header class="sidebar__header">
+      <button class="btn btn--ghost btn--icon" id="btn-search" title="Палитра команд (Ctrl+K)">
+        <i data-lucide="search"></i>
+      </button>
+      <span class="sidebar__title">My Notes</span>
+      <button class="btn btn--ghost btn--icon" id="btn-quick-switch" title="Быстрый переход (Ctrl+P)">
+        <i data-lucide="zap"></i>
+      </button>
+      <button class="btn btn--ghost btn--icon" id="btn-new-note" title="Новая заметка (Ctrl+Alt+N)">
+        <i data-lucide="plus"></i>
+      </button>
+    </header>
+
+    <div class="sidebar__filter" id="sidebar-filter" hidden>
+      <span class="sidebar__filter-label" id="sidebar-filter-label"></span>
+      <button class="btn btn--ghost btn--icon" id="btn-clear-filter" title="Сбросить фильтр">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    <div class="sidebar__list" id="notes-list" role="list">
+      <div class="sidebar__indicator" aria-hidden="true"></div>
+    </div>
+
+    <footer class="sidebar__footer">
+      <button class="btn btn--ghost btn--icon" id="btn-export" title="Экспорт всех в JSON">
+        <i data-lucide="download"></i>
+      </button>
+      <button class="btn btn--ghost btn--icon" id="btn-import" title="Импорт JSON">
+        <i data-lucide="upload"></i>
+      </button>
+      <button class="btn btn--ghost btn--icon" id="btn-import-md" title="Импорт Markdown">
+        <i data-lucide="file-input"></i>
+      </button>
+      <button class="btn btn--ghost btn--icon" id="btn-help" title="Горячие клавиши (?)">
+        <i data-lucide="circle-help"></i>
+      </button>
+    </footer>
+  </aside>
+
+  <main class="editor" aria-label="Редактор">
+    <header class="editor__topbar">
+      <button class="btn btn--ghost btn--icon" id="btn-toggle-sidebar" title="Свернуть список (Ctrl+\)">
+        <i data-lucide="panel-left"></i>
+      </button>
+
+      <input
+        class="editor__title"
+        id="note-title"
+        type="text"
+        placeholder="Без названия"
+        autocomplete="off"
+        spellcheck="false"
+      >
+
+      <button class="btn btn--ghost btn--icon" id="btn-pin" title="Закрепить (Ctrl+Shift+P)">
+        <i data-lucide="pin"></i>
+      </button>
+
+      <div class="editor__status" id="save-status" title="Сохранено">
+        <span class="status-dot"></span>
+      </div>
+
+      <button class="btn btn--ghost btn--icon" id="btn-toggle-outline" title="Свернуть контекст (Ctrl+Shift+O)">
+        <i data-lucide="panel-right"></i>
+      </button>
+    </header>
+
+    <div class="editor__tags" id="editor-tags" hidden></div>
+
+    <div class="editor__body" id="editor-body">
+      <div id="quill-editor"></div>
+    </div>
+
+    <div class="empty empty--editor" id="empty-state">
+      <i data-lucide="notebook-pen" class="empty__icon"></i>
+      <h2 class="empty__title">Здесь пока пусто</h2>
+      <p class="empty__text">
+        Нажми <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>N</kbd> чтобы создать первую заметку,<br>
+        или <kbd>Ctrl</kbd>+<kbd>K</kbd> чтобы открыть меню команд.
+      </p>
+    </div>
+  </main>
+
+  <aside class="outline" aria-label="Контекст">
+    <section class="outline__section">
+      <h3 class="outline__heading">Содержание</h3>
+      <nav class="outline__nav" id="outline-nav"></nav>
+    </section>
+
+    <section class="outline__section">
+      <h3 class="outline__heading">Обратные ссылки</h3>
+      <div class="outline__backlinks" id="backlinks-list"></div>
+    </section>
+
+    <section class="outline__section">
+      <h3 class="outline__heading">Информация</h3>
+      <div class="outline__meta" id="note-meta"></div>
+    </section>
+  </aside>
+
+</div>
+
+<div class="palette-backdrop" id="palette-backdrop" hidden></div>
+<div class="palette" id="palette" role="dialog" aria-modal="true" aria-label="Команды" hidden>
+  <div class="palette__input-wrap">
+    <i data-lucide="search" class="palette__icon"></i>
+    <input
+      class="palette__input"
+      id="palette-input"
+      type="text"
+      placeholder="Введите команду или запрос…"
+      autocomplete="off"
+      spellcheck="false"
+    >
+    <kbd class="palette__hint">esc</kbd>
+  </div>
+  <div class="palette__list" id="palette-list" role="listbox"></div>
+</div>
+
+<div class="palette-backdrop" id="quick-backdrop" hidden></div>
+<div class="palette palette--quick" id="quick" role="dialog" aria-modal="true" aria-label="Быстрый переход" hidden>
+  <div class="palette__input-wrap">
+    <i data-lucide="zap" class="palette__icon"></i>
+    <input
+      class="palette__input"
+      id="quick-input"
+      type="text"
+      placeholder="Перейти к заметке…"
+      autocomplete="off"
+      spellcheck="false"
+    >
+    <kbd class="palette__hint">esc</kbd>
+  </div>
+  <div class="palette__list" id="quick-list" role="listbox"></div>
+</div>
+
+<div class="help-backdrop" id="help-backdrop" hidden></div>
+<div class="help" id="help" role="dialog" aria-modal="true" aria-label="Горячие клавиши" hidden>
+  <header class="help__header">
+    <span class="help__title">Горячие клавиши</span>
+    <button class="btn btn--ghost btn--icon" id="btn-close-help" title="Закрыть (Esc)">
+      <i data-lucide="x"></i>
+    </button>
+  </header>
+  <div class="help__body">
+    <section class="help__section">
+      <h4 class="help__section-title">Основные</h4>
+      <div class="help__row"><span>Новая заметка</span><span><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>N</kbd></span></div>
+      <div class="help__row"><span>Палитра команд</span><span><kbd>Ctrl</kbd><kbd>K</kbd></span></div>
+      <div class="help__row"><span>Быстрый переход</span><span><kbd>Ctrl</kbd><kbd>P</kbd></span></div>
+      <div class="help__row"><span>Удалить заметку</span><span><kbd>Delete</kbd></span></div>
+    </section>
+    <section class="help__section">
+      <h4 class="help__section-title">Вид</h4>
+      <div class="help__row"><span>Свернуть список</span><span><kbd>Ctrl</kbd><kbd>\</kbd></span></div>
+      <div class="help__row"><span>Свернуть контекст</span><span><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>O</kbd></span></div>
+      <div class="help__row"><span>Закрепить</span><span><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>P</kbd></span></div>
+    </section>
+    <section class="help__section">
+      <h4 class="help__section-title">Данные</h4>
+      <div class="help__row"><span>Экспорт в Markdown</span><span><kbd>Ctrl</kbd><kbd>E</kbd></span></div>
+    </section>
+    <section class="help__section">
+      <h4 class="help__section-title">Редактор</h4>
+      <div class="help__row"><span>Жирный</span><span><kbd>Ctrl</kbd><kbd>B</kbd></span></div>
+      <div class="help__row"><span>Курсив</span><span><kbd>Ctrl</kbd><kbd>I</kbd></span></div>
+      <div class="help__row"><span>Slash-команды</span><span><kbd>/</kbd></span></div>
+    </section>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/turndown@7.2.0/dist/turndown.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
