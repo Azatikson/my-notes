@@ -56,8 +56,6 @@ git clone https://github.com/azatikson/my-notes.git
 
 Никаких зависимостей, сборки и настройки.
 
-Или откройте живую демонстрацию: **https://azatikson.github.io/my-notes**
-
 ## Горячие клавиши
 
 | Новая заметка | `Ctrl+Alt+N` |
