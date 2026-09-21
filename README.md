@@ -2,6 +2,22 @@
 
 Быстрые заметки с блочным редактором, без аккаунта и без сервера. Данные хранятся в браузере, экспортируются в файл.
 
+## 📸 Скриншоты
+
+<details>
+<summary><b>Показать скриншоты</b></summary>
+
+<img width="1280" height="717" alt="image" src="https://github.com/user-attachments/assets/cb332020-53da-4c14-88f2-50956fefc469" />
+
+<img width="1280" height="717" alt="image" src="https://github.com/user-attachments/assets/44c238f8-ceea-43a4-9522-6d4459382beb" />
+
+<img width="1280" height="718" alt="image" src="https://github.com/user-attachments/assets/1b7e449d-1c75-4fd7-9f4b-e1c68cace4a8" />
+
+<br>
+
+</details>
+
+
 ## Возможности
 
 - Блочный редактор на Quill:
